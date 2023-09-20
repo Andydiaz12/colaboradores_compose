@@ -52,7 +52,7 @@ fun CredentialContainer(modifier: Modifier, navigation: NavHostController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 10.dp)
                 .paint(
                     painterResource(id = R.drawable.imagen_credencial),
                     contentScale = ContentScale.FillWidth

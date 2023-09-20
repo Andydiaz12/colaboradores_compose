@@ -1,6 +1,12 @@
 package com.upaep.upaeppersonal.view.features.menu
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,25 +17,30 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -57,6 +68,7 @@ fun MenuScreen(navigation: NavHostController? = null) {
     val activeTheme by userPreferences.activeTheme.collectAsState(initial = defaultTheme)
     BaseView(transparentBackground = true, lazyPadding = 0.dp) {
         Column(modifier = Modifier.fillMaxWidth()) {
+            Spacer(modifier = Modifier.size(20.dp))
             Title(textColor = activeTheme!!.BASE_TEXT_COLOR)
             Content(activeTheme = activeTheme!!, onThemeChange = {})
         }
@@ -81,28 +93,12 @@ fun Content(activeTheme: ActiveTheme, onThemeChange: (ThemeSchema) -> Unit) {
             Text(text = "Tema", color = activeTheme.BASE_TEXT_COLOR)
             Spacer(modifier = Modifier.weight(1f))
             Text(text = "Claro", color = activeTheme.BASE_TEXT_COLOR)
-            Switch(
-                checked = validateTheme,
-                onCheckedChange = {
-                    onThemeChange(
-                        if (validateTheme) {
-                            ThemeSchema.LIGHT
-                        } else {
-                            ThemeSchema.DARK
-                        }
-                    )
-                },
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = Upaep_yellow,
-                    checkedTrackColor = Color.Green,
-                    uncheckedThumbColor = Color.Blue,
-                    uncheckedTrackColor = Color(0xFFA2A4A0),
-                    uncheckedBorderColor = Color.Transparent
-                ),
-                modifier = Modifier.padding(horizontal = 15.dp)
-            )
+            Spacer(modifier = Modifier.size(15.dp))
+            AnimatedSwitch()
+            Spacer(modifier = Modifier.size(15.dp))
             Text(text = "Oscuro", color = activeTheme.BASE_TEXT_COLOR)
         }
+        Spacer(modifier = Modifier.size(20.dp))
         for (element in ContentOptions()) {
             Text(text = element.name, color = activeTheme.BASE_TEXT_COLOR)
             Spacer(modifier = Modifier.size(20.dp))
@@ -110,47 +106,41 @@ fun Content(activeTheme: ActiveTheme, onThemeChange: (ThemeSchema) -> Unit) {
     }
 }
 
-@Preview
 @Composable
 fun AnimatedSwitch() {
-    var alignment by remember { mutableStateOf(Alignment.CenterStart) }
-    val alignmentAnimatable = remember { Animatable(0f) }
-    val transition = updateTransition(targetState = alignment)
+    var horizontalBias by remember { mutableStateOf(-1f) }
+    val alignment by animateHorizontalAlignmentAsState(horizontalBias)
 
-    LaunchedEffect(alignment) {
-        alignmentAnimatable.animateTo(
-            targetValue = when(alignment) {
-                Alignment.CenterStart -> 0f
-                Alignment.CenterEnd -> 1f
-                else -> 0f
-            }
-        )
-    }
-
-    Box(
+    Column(
         modifier = Modifier
             .clip(RoundedCornerShape(50.dp))
             .background(Color.Magenta)
-            .width(150.dp)
-            .height(50.dp)
+            .width(40.dp)
+            .height(25.dp)
             .clickable {
-                alignment = when (alignment) {
-                    Alignment.CenterStart -> Alignment.CenterEnd
-                    Alignment.CenterEnd -> Alignment.CenterStart
-                    else -> Alignment.CenterStart
-                }
-            }
+                horizontalBias *= -1
+            },
+        horizontalAlignment = alignment
     ) {
         Surface(
             modifier = Modifier
-                .size(50.dp)
-                .padding(5.dp)
+                .size(25.dp)
+                .padding(4.dp)
                 .clip(CircleShape)
-                .align(Alignment.CenterEnd)
+                .align(alignment)
         ) {
 
         }
     }
+}
+
+@SuppressLint("UnrememberedMutableState")
+@Composable
+private fun animateHorizontalAlignmentAsState(
+    targetBiasValue: Float
+): State<BiasAlignment.Horizontal> {
+    val bias by animateFloatAsState(targetBiasValue)
+    return derivedStateOf { BiasAlignment.Horizontal(bias) }
 }
 
 fun ContentOptions(): List<MenuElements> {

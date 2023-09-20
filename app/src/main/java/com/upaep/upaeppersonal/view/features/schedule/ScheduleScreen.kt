@@ -80,6 +80,7 @@ fun ModalContent(onDaySelect: (String) -> Unit) {
                 text = day,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(10.dp)
                     .clickable { onDaySelect(day) },
                 textAlign = TextAlign.Center
             )

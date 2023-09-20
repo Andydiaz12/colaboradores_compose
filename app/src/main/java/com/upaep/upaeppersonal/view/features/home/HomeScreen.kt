@@ -273,7 +273,8 @@ fun IndividualFeature(feature: Feature, modifier: Modifier, textColor: Color) {
             modifier = Modifier.fillMaxWidth(),
             color = textColor,
             fontFamily = roboto_regular,
-            fontSize = 14.sp
+            fontSize = 14.sp,
+            lineHeight = 14.sp
         )
     }
 }
