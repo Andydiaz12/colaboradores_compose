@@ -4,17 +4,24 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.upaep.upaeppersonal.view.features.assistance.AssistanceClassScreen
 import com.upaep.upaeppersonal.view.features.assistance.AssistanceScreen
 import com.upaep.upaeppersonal.view.features.benefits.BenefitsScreen
+import com.upaep.upaeppersonal.view.features.calendar.CalendarScreen
 import com.upaep.upaeppersonal.view.features.credential.CredentialScreen
 import com.upaep.upaeppersonal.view.features.credential.QrScreen
+import com.upaep.upaeppersonal.view.features.directory.DirectoryScreen
+import com.upaep.upaeppersonal.view.features.events.EventsScreen
 import com.upaep.upaeppersonal.view.features.home.HomeScreen
+import com.upaep.upaeppersonal.view.features.library.BooksListScreen
 import com.upaep.upaeppersonal.view.features.library.LibraryScreen
 import com.upaep.upaeppersonal.view.features.login.LoginScreen
+import com.upaep.upaeppersonal.view.features.mailbox.MailboxScreen
 import com.upaep.upaeppersonal.view.features.menu.MenuScreen
 import com.upaep.upaeppersonal.view.features.parku.ParkUScreen
 import com.upaep.upaeppersonal.view.features.schedule.ScheduleScreen
 import com.upaep.upaeppersonal.view.features.token.TokenScreen
+import com.upaep.upaeppersonal.view.features.upress.UpressScreen
 
 @Composable
 fun AppNavigation() {
@@ -29,6 +36,9 @@ fun AppNavigation() {
         composable(Routes.MenuScreen.routes) {
             MenuScreen(navigation = navigationController)
         }
+        composable(Routes.BooksListScreen.routes) {
+            BooksListScreen()
+        }
         composable(Routes.LibraryScreen.routes) {
             LibraryScreen(navigation = navigationController)
         }
@@ -37,6 +47,9 @@ fun AppNavigation() {
         }
         composable(Routes.QrScreen.routes) {
             QrScreen(navigation = navigationController)
+        }
+        composable(Routes.AssistanceClassScreen.routes) {
+            AssistanceClassScreen()
         }
         composable(Routes.AssistanceScreen.routes) {
             AssistanceScreen()
@@ -52,6 +65,21 @@ fun AppNavigation() {
         }
         composable(Routes.TokenScreen.routes) {
             TokenScreen()
+        }
+        composable(Routes.MailboxScreen.routes) {
+            MailboxScreen()
+        }
+        composable(Routes.DirectoryScreen.routes) {
+            DirectoryScreen()
+        }
+        composable(Routes.CalendarScreen.routes) {
+            CalendarScreen()
+        }
+        composable(Routes.UpressScreen.routes) {
+            UpressScreen()
+        }
+        composable(Routes.EventsScreen.routes) {
+            EventsScreen()
         }
     }
 }

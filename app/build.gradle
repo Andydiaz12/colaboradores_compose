@@ -20,6 +20,7 @@ android {
         vectorDrawables {
             useSupportLibrary true
         }
+        buildConfigField "String", "BUILD_DATE", "\"" + new Date().format("yyyyMMddHHmmss") + "\""
     }
 
     buildTypes {

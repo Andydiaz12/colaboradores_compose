@@ -1,4 +1,4 @@
-package com.upaep.upaeppersonal.model.entities.home
+package com.upaep.upaeppersonal.model.entities.features.home
 
 import com.google.gson.annotations.SerializedName
 

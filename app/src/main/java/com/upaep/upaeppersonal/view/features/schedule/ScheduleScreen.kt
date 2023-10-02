@@ -38,6 +38,7 @@ import com.upaep.upaeppersonal.model.base.UserPreferences
 import com.upaep.upaeppersonal.view.base.defaultvalues.defaultTheme
 import com.upaep.upaeppersonal.view.base.genericcomponents.BaseView
 import com.upaep.upaeppersonal.view.base.genericcomponents.BaseViewWithModal
+import com.upaep.upaeppersonal.view.base.genericcomponents.ModalListGeneric
 import com.upaep.upaeppersonal.view.base.theme.Yellow_Schedule
 import com.upaep.upaeppersonal.view.base.theme.roboto_bold
 import com.upaep.upaeppersonal.view.base.theme.roboto_regular
@@ -52,45 +53,26 @@ fun ScheduleScreen() {
     val state = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
     val scope = rememberCoroutineScope()
     var selectedDay by remember { mutableStateOf("Lunes") }
-    BaseViewWithModal(modalContent = {
-        ModalContent(onDaySelect = { day ->
-            scope.launch {
-                selectedDay = day
-                state.hide()
+    BaseViewWithModal(
+        modalContent = {
+            ModalListGeneric(onElementClick = { day ->
+                scope.launch {
+                    selectedDay = day.toString()
+                    state.hide()
+                }
+            }, list = getDayList(), selected = selectedDay)
+        }, content = {
+            for (index in 0..3) {
+                SingleClass(textColor = activeTheme!!.BASE_TEXT_COLOR)
             }
-        })
-    }, content = {
-        for (index in 0..3) {
-            SingleClass(textColor = activeTheme!!.BASE_TEXT_COLOR)
-        }
-    }, cardHeader = {
-        CardScheduleHeader(selectedDay = selectedDay) {
+        },
+        upperCardText = selectedDay,
+        onUpperCardClick = {
             scope.launch { state.show() }
-        }
-    }, state = state, loading = false)
-}
-
-@Composable
-fun ModalContent(onDaySelect: (String) -> Unit) {
-    val days = getDayList()
-    Column {
-        Spacer(modifier = Modifier.size(10.dp))
-        days.forEachIndexed { index, day ->
-            Text(
-                text = day,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .clickable { onDaySelect(day) },
-                textAlign = TextAlign.Center
-            )
-            if (index + 1 < days.size) {
-                Divider(modifier = Modifier.padding(10.dp))
-            } else {
-                Spacer(modifier = Modifier.size(10.dp))
-            }
-        }
-    }
+        },
+        multipleElements = true,
+        state = state, loading = false
+    )
 }
 
 @Composable
@@ -117,25 +99,6 @@ fun SingleClass(textColor: Color) {
             fontSize = 10.sp
         )
         Divider(modifier = Modifier.padding(top = 10.dp))
-    }
-}
-
-@Composable
-fun CardScheduleHeader(selectedDay: String, onCardClick: () -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .background(Yellow_Schedule)
-            .clickable { onCardClick() }
-            .padding(12.dp)
-    ) {
-        Text(text = selectedDay, color = Color.White, fontSize = 12.sp, fontFamily = roboto_regular)
-        Spacer(modifier = Modifier.weight(1f))
-        Image(
-            imageVector = Icons.Default.ArrowDropDown,
-            contentDescription = "",
-            colorFilter = ColorFilter.tint(Color.White)
-        )
     }
 }
 

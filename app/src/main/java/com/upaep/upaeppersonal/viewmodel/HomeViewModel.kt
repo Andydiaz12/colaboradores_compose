@@ -3,7 +3,6 @@ package com.upaep.upaeppersonal.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.upaep.upaeppersonal.model.base.entities.Test
 import com.upaep.upaeppersonal.model.repository.HomeRepository
 import com.upaep.upaeppersonal.view.base.ScreenStates
 import com.upaep.upaeppersonal.view.base.ScreenStates.*
@@ -26,29 +25,29 @@ class HomeViewModel @Inject constructor(
     private val _uiState : MutableStateFlow<ScreenStates> = MutableStateFlow(Loading)
     val uiState: StateFlow<ScreenStates> = _uiState
 
-    init {
-        viewModelScope.launch {
-            homeRepository.test.collect {
-                _uiState.value = if(it.data.isEmpty()) EmptyData else Success(data = it.data)
-                Log.i("debugTest", it.toString())
-            }
-        }
-    }
+//    init {
+//        viewModelScope.launch {
+//            homeRepository.test.collect {
+//                _uiState.value = if(it.data.isEmpty()) EmptyData else Success(data = it.data)
+//                Log.i("debugTest", it.toString())
+//            }
+//        }
+//    }
 
 
-    fun agregarRandom() {
-        val test =
-            Test(name = generarCadenaAleatoria(5), extra = Random.Default.nextInt(10).toString())
-        viewModelScope.launch {
-            homeRepository.addTest(test)
-        }
-    }
-
-    fun deleteData() {
-        viewModelScope.launch {
-            homeRepository.deleteData()
-        }
-    }
+//    fun agregarRandom() {
+//        val test =
+//            Test(name = generarCadenaAleatoria(5), extra = Random.Default.nextInt(10).toString())
+//        viewModelScope.launch {
+//            homeRepository.addTest(test)
+//        }
+//    }
+//
+//    fun deleteData() {
+//        viewModelScope.launch {
+//            homeRepository.deleteData()
+//        }
+//    }
 
     private fun generarCadenaAleatoria(longitud: Int): String {
         val caracteres = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"

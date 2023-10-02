@@ -32,20 +32,25 @@ import androidx.navigation.NavHostController
 import com.upaep.upaeppersonal.model.base.UserPreferences
 import com.upaep.upaeppersonal.model.entities.theme.ActiveTheme
 import com.upaep.upaeppersonal.view.base.defaultvalues.defaultTheme
+import com.upaep.upaeppersonal.view.base.theme.Yellow_Schedule
 import com.upaep.upaeppersonal.view.base.theme.roboto_bold
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BaseView(
-    navigation: NavHostController? = null,
     text: String = "",
-    onRefresh: () -> Unit = {},
-    loading: Boolean = false,
-    screenName: String = "",
-    transparentBackground: Boolean = false,
-    rightIcon: Boolean = true,
     lazyPadding: Dp = 15.dp,
-    cardHeader: @Composable (() -> Unit)? = null,
+    screenName: String = "",
+    loading: Boolean = false,
+    rightIcon: Boolean = true,
+    onRefresh: () -> Unit = {},
+    upperCardText: String? = null,
+    onUpperCardClick: () -> Unit = {},
+    multipleElements: Boolean = false,
+    navigation: NavHostController? = null,
+    transparentBackground: Boolean = false,
+    cardPickerColor: Color = Yellow_Schedule,
+    upperCardContent: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
@@ -70,9 +75,13 @@ fun BaseView(
                 end.linkTo(parent.end)
                 height = Dimension.fillToConstraints.atMostWrapContent
             },
-            cardHeader = cardHeader,
             transparentBackground = transparentBackground,
-            lazyPadding = lazyPadding
+            lazyPadding = lazyPadding,
+            upperCardText = upperCardText,
+            onUpperCardClick = onUpperCardClick,
+            multipleElements = multipleElements,
+            cardPickerColor = cardPickerColor,
+            upperCardContent = upperCardContent
         )
     }
 }
@@ -80,14 +89,18 @@ fun BaseView(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CardContent(
-    refreshState: PullRefreshState,
-    modifier: Modifier,
     text: String,
-    activeTheme: ActiveTheme,
-    loading: Boolean,
-    transparentBackground: Boolean,
     lazyPadding: Dp,
-    cardHeader: @Composable (() -> Unit)? = null,
+    loading: Boolean,
+    modifier: Modifier,
+    upperCardText: String?,
+    cardPickerColor: Color,
+    activeTheme: ActiveTheme,
+    multipleElements: Boolean,
+    onUpperCardClick: () -> Unit,
+    refreshState: PullRefreshState,
+    transparentBackground: Boolean,
+    upperCardContent: (@Composable () -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
     Column(
@@ -95,6 +108,7 @@ fun CardContent(
             .fillMaxSize()
             .padding(15.dp)
     ) {
+        Spacer(modifier = Modifier.size(10.dp))
         if (text.isNotEmpty()) {
             Text(
                 text = text,
@@ -103,6 +117,9 @@ fun CardContent(
                 fontSize = 14.sp
             )
             Spacer(modifier = Modifier.size(15.dp))
+        }
+        if(upperCardContent != null) {
+            upperCardContent()
         }
         Card(
             Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(
@@ -113,12 +130,17 @@ fun CardContent(
         ) {
             Box {
                 Column {
-                    if (cardHeader != null) {
-                        cardHeader()
+                    if (!upperCardText.isNullOrBlank()) {
+                        CardPicker(
+                            onCardClick = { onUpperCardClick() },
+                            textContent = upperCardText,
+                            multipleElements = multipleElements,
+                            cardPickerColor = cardPickerColor
+                        )
                     }
                     LazyColumn(
                         modifier = Modifier
-                            .padding(horizontal = lazyPadding)
+                            .padding(horizontal = lazyPadding, vertical = 10.dp)
                             .pullRefresh(refreshState)
                     ) {
                         item {

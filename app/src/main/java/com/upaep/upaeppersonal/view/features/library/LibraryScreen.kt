@@ -1,11 +1,18 @@
 package com.upaep.upaeppersonal.view.features.library
 
+import android.content.Intent
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -30,7 +37,9 @@ import com.upaep.upaeppersonal.R
 import com.upaep.upaeppersonal.model.base.UserPreferences
 import com.upaep.upaeppersonal.model.entities.theme.ActiveTheme
 import com.upaep.upaeppersonal.view.base.defaultvalues.defaultTheme
+import com.upaep.upaeppersonal.view.base.genericcomponents.BaseView
 import com.upaep.upaeppersonal.view.base.genericcomponents.Header
+import com.upaep.upaeppersonal.view.base.navigation.Routes
 import com.upaep.upaeppersonal.view.base.theme.Upaep_yellow
 import com.upaep.upaeppersonal.view.base.theme.roboto_bold
 import com.upaep.upaeppersonal.view.base.theme.roboto_regular
@@ -41,52 +50,39 @@ fun LibraryScreen(navigation: NavHostController? = null) {
     val context = LocalContext.current
     val userPreferences = UserPreferences(context)
     val activeTheme = userPreferences.activeTheme.collectAsState(initial = defaultTheme).value
-    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-        val (header, content) = createRefs()
-        Header(modifier = Modifier.constrainAs(header) {
-            top.linkTo(parent.top)
-        }, navigation = navigation, screenName = "BIBLIOTECA")
-        ContentScreen(modifier = Modifier.constrainAs(content) {
-            top.linkTo(header.bottom)
-            start.linkTo(parent.start)
-            end.linkTo(parent.end)
-            bottom.linkTo(parent.bottom)
-            height = Dimension.fillToConstraints
-        }, theme = activeTheme!!)
-    }
+    val webLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = {})
+    BaseView(
+        transparentBackground = true,
+        text = "Aplica únicamente para la biblioteca del campus central",
+        screenName = "BIBLIOTECA"
+    ) { ContentScreen(activeTheme = activeTheme!!, webLauncher = webLauncher, navigation = navigation) }
 }
 
 @Composable
-fun ContentScreen(modifier: Modifier, theme: ActiveTheme) {
-    LazyColumn(
-        modifier = modifier.padding(end = 10.dp, start = 10.dp, top = 10.dp),
+fun ContentScreen(activeTheme: ActiveTheme, webLauncher: ActivityResultLauncher<Intent>, navigation: NavHostController?) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        item {
-            Spacer(modifier = Modifier.size(20.dp))
-            Text(
-                text = "Aplica únicamente para la biblioteca del campus central",
-                fontFamily = roboto_regular,
-                fontSize = 14.sp,
-                color = theme.BASE_TEXT_COLOR,
-                modifier = Modifier.padding(horizontal = 20.dp)
-            )
-            Spacer(modifier = Modifier.size(40.dp))
-            SingleCircle(
-                text = "BIBLIOTECA VIRTUAL",
-                border = Upaep_yellow,
-                image = theme.LIBRARY_ICON,
-                backgroundColor = theme.BASE_BACKGROUND_COLOR,
-                textColor = theme.BASE_TEXT_COLOR
-            )
-            SingleCircle(
-                text = "RENOVACIÓN DE LIBROS",
-                border = Upaep_yellow,
-                image = R.drawable.icono_renovacion_libros,
-                backgroundColor = Upaep_yellow,
-                textColor = Color.White
-            )
-        }
+        Spacer(modifier = Modifier.size(40.dp))
+        SingleCircle(
+            text = "BIBLIOTECA VIRTUAL",
+            border = Upaep_yellow,
+            image = activeTheme.LIBRARY_ICON,
+            backgroundColor = activeTheme.BASE_BACKGROUND_COLOR,
+            textColor = activeTheme.BASE_TEXT_COLOR,
+            webLauncher = webLauncher
+        )
+        SingleCircle(
+            text = "RENOVACIÓN DE LIBROS",
+            border = Upaep_yellow,
+            image = R.drawable.icono_renovacion_libros,
+            backgroundColor = Upaep_yellow,
+            textColor = Color.White,
+            navigation = navigation
+        )
     }
 }
 
@@ -96,7 +92,9 @@ fun SingleCircle(
     border: Color,
     image: Int,
     backgroundColor: Color,
-    textColor: Color
+    textColor: Color,
+    webLauncher: ActivityResultLauncher<Intent>? = null,
+    navigation: NavHostController? = null
 ) {
     Surface(
         color = backgroundColor,
@@ -105,6 +103,15 @@ fun SingleCircle(
         modifier = Modifier
             .padding(vertical = 20.dp)
             .size(150.dp)
+            .clickable {
+                if (webLauncher != null) {
+                    val intent =
+                        Intent(Intent.ACTION_VIEW, Uri.parse("https://biblioteca.upaep.mx"))
+                    webLauncher.launch(intent)
+                } else {
+                    navigation?.navigate(Routes.BooksListScreen.routes)
+                }
+            }
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

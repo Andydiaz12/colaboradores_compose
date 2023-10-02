@@ -113,7 +113,7 @@ fun CenterElements(
         )
     } else {
         Text(
-            text = screenName ?: "",
+            text = screenName?.uppercase() ?: "",
             modifier = modifier,
             textAlign = TextAlign.Center,
             color = screenNameColor,

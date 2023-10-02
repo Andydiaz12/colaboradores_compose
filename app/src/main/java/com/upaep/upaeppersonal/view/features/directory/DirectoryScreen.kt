@@ -1,6 +1,9 @@
 package com.upaep.upaeppersonal.view.features.directory
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
@@ -9,17 +12,23 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowRight
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -34,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import com.upaep.upaeppersonal.R
 import com.upaep.upaeppersonal.model.entities.features.directory.DirectoryPerson
 import com.upaep.upaeppersonal.view.base.genericcomponents.BaseView
+import com.upaep.upaeppersonal.view.base.theme.Arrow_color
+import com.upaep.upaeppersonal.view.base.theme.Dark_grey
 import com.upaep.upaeppersonal.view.base.theme.Gray_title
 
 @Preview(showSystemUi = true)
@@ -57,7 +69,8 @@ fun DirectoryScreen() {
             },
             visibleDescription = visibleDescription,
             value = searchValue,
-            onValueChange = { newValue -> searchValue = newValue }
+            onValueChange = { newValue -> searchValue = newValue },
+            resetValue = { searchValue = "" }
         )
     }
 }
@@ -68,9 +81,10 @@ fun DirectoryContent(
     onPersonClick: (Int) -> Unit,
     visibleDescription: List<Boolean>,
     value: String,
-    onValueChange: (String) -> Unit
+    onValueChange: (String) -> Unit,
+    resetValue: () -> Unit
 ) {
-    Column() {
+    Column {
         BasicTextField(
             value = value,
             onValueChange = { onValueChange(it) },
@@ -82,9 +96,27 @@ fun DirectoryContent(
                             color = Gray_title,
                             shape = RoundedCornerShape(20.dp)
                         )
-                        .padding(10.dp)
+                        .padding(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(modifier = Modifier.weight(1f)) {
+                    if (value.isNotEmpty()) {
+                        Surface(
+                            color = Dark_grey,
+                            shape = CircleShape,
+                            modifier = Modifier.clickable { resetValue() }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "",
+                                tint = Color.White,
+                                modifier = Modifier.size(15.dp)
+                            )
+                        }
+                    }
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 5.dp)
+                    ) {
                         if (value.isEmpty()) {
                             Text(text = "Buscar")
                         }
@@ -96,6 +128,7 @@ fun DirectoryContent(
                     )
                 }
             })
+        Spacer(modifier = Modifier.size(10.dp))
         directoryPeople.forEachIndexed { index, person ->
             SinglePersonDesc(
                 directoryPerson = person,
@@ -114,6 +147,8 @@ fun SinglePersonDesc(
     onPersonClick: (Int) -> Unit,
     isVisible: Boolean
 ) {
+    val currentRotation by remember { mutableStateOf(0f) }
+    val rotation = remember { Animatable(currentRotation) }
     Column {
         Row(
             modifier = Modifier
@@ -130,15 +165,29 @@ fun SinglePersonDesc(
                     .size(14.dp)
             )
             Text(text = directoryPerson.name ?: "", modifier = Modifier.weight(1f))
-            Icon(imageVector = Icons.Default.ArrowRight, contentDescription = "")
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = "",
+                modifier = Modifier.rotate(rotation.value),
+                tint = Arrow_color
+            )
         }
-        Divider()
         AnimatedVisibility(
             visible = isVisible,
             enter = expandVertically(expandFrom = Alignment.Top),
-            exit = shrinkVertically(shrinkTowards = Alignment.Bottom)
+            exit = shrinkVertically(shrinkTowards = Alignment.Top)
         ) {
             PersonDescription(directoryPerson = directoryPerson)
+        }
+        Divider()
+        LaunchedEffect(isVisible) {
+            rotation.animateTo(
+                targetValue = if(isVisible) -180f else 0f,
+                animationSpec = tween(
+                    durationMillis = 300,
+                    easing = LinearEasing
+                )
+            )
         }
     }
 }
@@ -164,7 +213,6 @@ fun PersonDescription(directoryPerson: DirectoryPerson) {
                 text = directoryPerson.mail!!
             )
         }
-        Divider()
     }
 }
 

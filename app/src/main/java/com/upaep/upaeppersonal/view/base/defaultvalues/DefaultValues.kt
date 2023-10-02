@@ -6,5 +6,5 @@ import com.upaep.upaeppersonal.view.base.theme.ThemeSchema
 
 private val gson = Gson()
 
-val defaultThemeStringify: String = gson.toJson(ThemeSchema.LIGHT)
+private val defaultThemeStringify: String = gson.toJson(ThemeSchema.LIGHT)
 val defaultTheme: ActiveTheme = gson.fromJson(defaultThemeStringify, ActiveTheme::class.java)

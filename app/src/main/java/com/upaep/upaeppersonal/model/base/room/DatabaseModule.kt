@@ -3,7 +3,6 @@ package com.upaep.upaeppersonal.model.base.room
 import android.content.Context
 import androidx.room.Room
 import com.upaep.upaeppersonal.model.database.ColaboradoresDatabase
-import com.upaep.upaeppersonal.model.database.TestDAO
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,10 +14,10 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 class DatabaseModule {
 
-    @Provides
-    fun providesTest(colaboradoresDatabase: ColaboradoresDatabase): TestDAO {
-        return colaboradoresDatabase.testDAO()
-    }
+//    @Provides
+//    fun providesTest(colaboradoresDatabase: ColaboradoresDatabase): TestDAO {
+//        return colaboradoresDatabase.testDAO()
+//    }
 
     @Provides
     @Singleton

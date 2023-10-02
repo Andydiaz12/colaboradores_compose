@@ -44,7 +44,7 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import com.upaep.upaeppersonal.R
 import com.upaep.upaeppersonal.model.base.UserPreferences
-import com.upaep.upaeppersonal.model.entities.home.Feature
+import com.upaep.upaeppersonal.model.entities.features.home.Feature
 import com.upaep.upaeppersonal.view.base.defaultvalues.defaultTheme
 import com.upaep.upaeppersonal.view.base.genericcomponents.Header
 import com.upaep.upaeppersonal.view.base.navigation.Routes

@@ -1,5 +1,6 @@
 package com.upaep.upaeppersonal.view.features.assistance
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.upaep.upaeppersonal.model.base.UserPreferences
 import com.upaep.upaeppersonal.model.entities.theme.ActiveTheme
 import com.upaep.upaeppersonal.view.base.defaultvalues.defaultTheme
@@ -44,7 +46,7 @@ fun AssistanceScreen(assistanceViewModel: AssistanceViewModel = hiltViewModel())
 
 @Composable
 fun SingleClass(activeTheme: ActiveTheme) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = Modifier.fillMaxWidth().clickable {  }) {
         Text(
             text = "DESARROLLO WEB PARA MÓVILES",
             color = activeTheme.BASE_TEXT_COLOR,
