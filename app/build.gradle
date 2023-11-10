@@ -24,9 +24,21 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField "String", "LOCKSMITH_JWT_KEY", "\"y6vWDdYRUm9rHzjpPI0l4TyevJUkZcmolBLgZv3FFp96fUE4DtkxODTEnYdokAeI\""
+            buildConfigField "String", "LOCKSMITH_CONFIG", "\"OFNxcHVFVmRidmE1JjE5Jjk5OTk5OTk5JjE5\""
+            buildConfigField "String", "LOCKSMITH_AES_KEY", "\"c21hdWdEZXNvbGF0aW9uOkQmNCYxMzQ3\""
+            buildConfigField "String", "LOCKSMITH_AES_IV", "\"aXYTM0nLis4lrRG4\""
+            buildConfigField "Integer", "LOCKSMITH_AES_BLOCK_SIZE", "256"
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "LOCKSMITH_JWT_KEY", "\"y6vWDdYRUm9rHzjpPI0l4TyevJUkZcmolBLgZv3FFp96fUE4DtkxODTEnYdokAeI\""
+            buildConfigField "String", "LOCKSMITH_CONFIG", "\"OFNxcHVFVmRidmE1JjIwJjMzNTk3OTEmMTUz\""
+            buildConfigField "String", "LOCKSMITH_AES_KEY", "\"c21hdWdEZXNvbGF0aW9uOkQmNCYxMzQ3\""
+            buildConfigField "String", "LOCKSMITH_AES_IV", "\"aXYTM0nLis4lrRG4\""
+            buildConfigField "Integer", "LOCKSMITH_AES_BLOCK_SIZE", "256"
         }
     }
     compileOptions {
@@ -37,6 +49,7 @@ android {
         jvmTarget = '1.8'
     }
     buildFeatures {
+        buildConfig true
         compose true
     }
     composeOptions {
@@ -128,6 +141,13 @@ dependencies {
     //XZing
     implementation 'com.google.zxing:core:3.5.1'
     implementation 'com.journeyapps:zxing-android-embedded:4.1.0'
+
+    //Coil
+    implementation "io.coil-kt:coil-compose:2.4.0"
+
+    //JWT Creator
+    implementation 'io.jsonwebtoken:jjwt:0.9.1'
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.7.21"
 }
 
 kapt {

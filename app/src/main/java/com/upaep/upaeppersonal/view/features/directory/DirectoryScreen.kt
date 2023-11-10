@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import com.upaep.upaeppersonal.R
 import com.upaep.upaeppersonal.model.entities.features.directory.DirectoryPerson
 import com.upaep.upaeppersonal.view.base.genericcomponents.BaseView
+import com.upaep.upaeppersonal.view.base.genericcomponents.EmptyData
 import com.upaep.upaeppersonal.view.base.theme.Arrow_color
 import com.upaep.upaeppersonal.view.base.theme.Dark_grey
 import com.upaep.upaeppersonal.view.base.theme.Gray_title
@@ -129,13 +130,17 @@ fun DirectoryContent(
                 }
             })
         Spacer(modifier = Modifier.size(10.dp))
-        directoryPeople.forEachIndexed { index, person ->
-            SinglePersonDesc(
-                directoryPerson = person,
-                index = index,
-                onPersonClick = onPersonClick,
-                isVisible = visibleDescription[index]
-            )
+        if (true) {
+            EmptyData(message = "No se han encontrado datos")
+        } else {
+            directoryPeople.forEachIndexed { index, person ->
+                SinglePersonDesc(
+                    directoryPerson = person,
+                    index = index,
+                    onPersonClick = onPersonClick,
+                    isVisible = visibleDescription[index]
+                )
+            }
         }
     }
 }
@@ -182,7 +187,7 @@ fun SinglePersonDesc(
         Divider()
         LaunchedEffect(isVisible) {
             rotation.animateTo(
-                targetValue = if(isVisible) -180f else 0f,
+                targetValue = if (isVisible) -180f else 0f,
                 animationSpec = tween(
                     durationMillis = 300,
                     easing = LinearEasing

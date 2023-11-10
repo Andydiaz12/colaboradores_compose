@@ -140,11 +140,13 @@ fun CardContent(
                     }
                     LazyColumn(
                         modifier = Modifier
-                            .padding(horizontal = lazyPadding, vertical = 10.dp)
+                            .padding(horizontal = lazyPadding)
                             .pullRefresh(refreshState)
                     ) {
                         item {
+                            Spacer(modifier = Modifier.size(10.dp))
                             content()
+                            Spacer(modifier = Modifier.size(10.dp))
                         }
                     }
                 }

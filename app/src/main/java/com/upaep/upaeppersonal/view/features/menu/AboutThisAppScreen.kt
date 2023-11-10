@@ -22,13 +22,13 @@ import java.text.DateFormat
 @Composable
 fun AboutThisAppScreen() {
     BaseView {
-        AboutSectionImage()
+//        AboutSectionImage()
         AboutSectionText(text = "Versión 1.3")
         AboutSectionText(text = "Innovación y Desarrollo Digital", fontFamily = roboto_regular)
-        AboutSectionImage()
+//        AboutSectionImage()
         AboutSectionText(text = "Fecha de actualización")
         AboutSectionText(text = "")
-        AboutSectionImage()
+//        AboutSectionImage()
         AboutSectionText(text = "Soporte")
         AboutSectionText(text = "idd@upaep.mx", fontFamily = roboto_regular)
     }

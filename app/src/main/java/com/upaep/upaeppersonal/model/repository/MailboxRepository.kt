@@ -1,4 +1,4 @@
-package com.upaep.upaeppersonal.model.repository.features
+package com.upaep.upaeppersonal.model.repository
 
 import com.upaep.upaeppersonal.model.api.features.MailboxService
 import com.upaep.upaeppersonal.model.entities.features.mailbox.MailboxFormResponse

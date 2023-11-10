@@ -1,5 +1,6 @@
 package com.upaep.upaeppersonal.view.base.navigation
 
+import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,6 +22,7 @@ import com.upaep.upaeppersonal.view.features.menu.MenuScreen
 import com.upaep.upaeppersonal.view.features.parku.ParkUScreen
 import com.upaep.upaeppersonal.view.features.schedule.ScheduleScreen
 import com.upaep.upaeppersonal.view.features.token.TokenScreen
+import com.upaep.upaeppersonal.view.features.upress.UpressDescriptionScreen
 import com.upaep.upaeppersonal.view.features.upress.UpressScreen
 
 @Composable
@@ -76,7 +78,10 @@ fun AppNavigation() {
             CalendarScreen()
         }
         composable(Routes.UpressScreen.routes) {
-            UpressScreen()
+            UpressScreen(navigation = navigationController)
+        }
+        composable(Routes.UpressDescScreen.routes) {
+            UpressDescriptionScreen()
         }
         composable(Routes.EventsScreen.routes) {
             EventsScreen()

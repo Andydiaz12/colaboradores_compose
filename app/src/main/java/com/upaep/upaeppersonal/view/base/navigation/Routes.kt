@@ -1,5 +1,7 @@
 package com.upaep.upaeppersonal.view.base.navigation
 
+import com.upaep.upaeppersonal.model.entities.features.upress.UpressItem
+
 sealed class Routes(val routes: String, val id: String = "") {
     data object LoginScreen : Routes("loginScreen")
     data object HomeScreen : Routes("homeScreen")
@@ -19,6 +21,7 @@ sealed class Routes(val routes: String, val id: String = "") {
     data object CalendarScreen : Routes("calendarScreen", id = "7")
     data object UpressScreen : Routes("upressScreen", id = "5")
     data object EventsScreen : Routes("eventsScreen", id = "11")
+    data object UpressDescScreen: Routes("upressDescScreen")
 
     companion object {
         fun getById(id: String): Routes? {

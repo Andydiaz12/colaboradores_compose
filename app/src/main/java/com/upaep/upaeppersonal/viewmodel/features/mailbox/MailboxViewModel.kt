@@ -9,10 +9,9 @@ import androidx.lifecycle.viewModelScope
 import com.upaep.upaeppersonal.model.entities.features.mailbox.MailboxFormResponse
 import com.upaep.upaeppersonal.model.entities.features.mailbox.MailboxSurveyType
 import com.upaep.upaeppersonal.model.entities.features.mailbox.SurveyResponses
-import com.upaep.upaeppersonal.model.repository.features.MailboxRepository
+import com.upaep.upaeppersonal.model.repository.MailboxRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.util.concurrent.Flow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -38,7 +37,7 @@ class MailboxViewModel @Inject constructor(private val mailboxRepository: Mailbo
         viewModelScope.launch {
             val values = mailboxRepository.getMailboxOptions()
             _mailboxOptions.value =
-                values.data.filter { it.isSatisfactionSurvey != 1 }.sortedBy { it.topicId }
+                values.data?.filter { it.isSatisfactionSurvey != 1 }?.sortedBy { it.topicId }
             if (_mailboxOptions.value!!.isNotEmpty()) {
                 getMailBoxSurvey(surveyType = _mailboxOptions.value!!.first())
             }
@@ -49,10 +48,10 @@ class MailboxViewModel @Inject constructor(private val mailboxRepository: Mailbo
         viewModelScope.launch {
             _selectedOption.value = surveyType
             val response =
-                mailboxRepository.getMailboxSurvey(surveyId = surveyType.topicId).data.sortedBy { it.order }
+                mailboxRepository.getMailboxSurvey(surveyId = surveyType.topicId).data?.sortedBy { it.order }
             _answers.clear()
             _surveyOptions.clear()
-            response.forEach { element ->
+            response?.forEach { element ->
                 _answers.add(
                     SurveyResponses(
                         itemId = element.itemId,
@@ -62,7 +61,7 @@ class MailboxViewModel @Inject constructor(private val mailboxRepository: Mailbo
                 )
             }
             submitAnswers()
-            _surveyOptions.addAll(response)
+            _surveyOptions.addAll(response ?: emptyList())
         }
     }
 
@@ -70,13 +69,10 @@ class MailboxViewModel @Inject constructor(private val mailboxRepository: Mailbo
         _selectedOption.value = option
     }
 
-    fun inputChange(element: MailboxFormResponse, value: String) {
-        val element = _answers.find { it.itemId == element.itemId }
-        val index = _answers.indexOf(element)
-        _answers[index] = _answers[index].let {
-            it.copy(responseValue = value)
-        }
-//        _answers.find { it.itemId == element.itemId }?.responseValue = value
+    fun inputChange(element: MailboxFormResponse, value: String, componentType: Int = -1) {
+        val elementToFind = _answers.find { it.itemId == element.itemId }
+        val index = _answers.indexOf(elementToFind)
+        _answers[index] = _answers[index].copy(responseValue = if(componentType == 16) null else value)
         _enabledBtn.value = enabledBtn()
     }
 
@@ -87,6 +83,7 @@ class MailboxViewModel @Inject constructor(private val mailboxRepository: Mailbo
     }
 
     private fun enabledBtn(): Boolean =
-        !_answers.any { element -> (element.required == true && element.responseValue.isNullOrBlank()) || (element.componentType == 4 && !element.responseValue.toBoolean()) }
-
+        !_answers.any { element ->
+            (element.required == true && element.responseValue.isNullOrBlank()) || (element.componentType == 4 && !element.responseValue.toBoolean())
+        }
 }

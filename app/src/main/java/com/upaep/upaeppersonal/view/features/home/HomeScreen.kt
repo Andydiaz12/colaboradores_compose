@@ -236,7 +236,7 @@ fun FeaturesContainer(features: List<Feature>, textColor: Color, navigation: Nav
                                     it
                                 } else {
                                     it.clickable {
-                                        navigation?.navigate(routes)
+                                        navigation?.navigate(routes) { launchSingleTop = true }
                                     }
                                 }
                             },
@@ -321,7 +321,6 @@ fun getFeatures(): List<Feature> {
         Feature(featureId = "3", featureName = "Directorio", order = 6, featureIcon = ""),
         Feature(featureId = "4", featureName = "Correo del día", order = 7, featureIcon = ""),
         Feature(featureId = "5", featureName = "UPRESS", order = 8, featureIcon = ""),
-        Feature(featureId = "6", featureName = "Evangelio del día", order = 9, featureIcon = ""),
         Feature(featureId = "7", featureName = "Calendarios", order = 10, featureIcon = ""),
         Feature(featureId = "8", featureName = "Buzón", order = 11, featureIcon = ""),
         Feature(featureId = "9", featureName = "Biblioteca", order = 12, featureIcon = ""),
