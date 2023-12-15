@@ -10,16 +10,18 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.upaep.upaeppersonal.R
+import com.upaep.upaeppersonal.model.entities.theme.ActiveTheme
 import com.upaep.upaeppersonal.view.base.theme.roboto_bold
 
 @Composable
-fun EmptyData(message: String) {
+fun EmptyData(message: String, theme: ActiveTheme? = null) {
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
         Image(
             painter = painterResource(id = R.drawable.icono_no_data),
@@ -27,6 +29,12 @@ fun EmptyData(message: String) {
             modifier = Modifier.size(150.dp)
         )
         Spacer(modifier = Modifier.size(10.dp))
-        Text(text = message, textAlign = TextAlign.Center, fontFamily = roboto_bold, fontSize = 14.sp)
+        Text(
+            text = message,
+            textAlign = TextAlign.Center,
+            fontFamily = roboto_bold,
+            fontSize = 14.sp,
+            color = theme?.BASE_TEXT_COLOR ?: Color.Black
+        )
     }
 }

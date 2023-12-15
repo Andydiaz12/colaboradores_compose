@@ -2,6 +2,7 @@ package com.upaep.upaeppersonal.view.base.genericcomponents
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -91,7 +92,11 @@ fun LeftElements(
             contentDescription = "",
             modifier = modifier
                 .size(20.dp)
-                .clickable { backButton() }
+                .clickable(
+                    onClick = { backButton() },
+                    interactionSource = MutableInteractionSource(),
+                    indication = null
+                )
         )
     } else {
         Spacer(modifier = modifier)
@@ -135,7 +140,10 @@ fun RightElements(
             contentDescription = "",
             modifier = modifier
                 .size(18.dp)
-                .clickable { showMenu() }
+                .clickable(
+                    interactionSource = MutableInteractionSource(),
+                    indication = null
+                ) { showMenu() }
         )
     } else {
         Spacer(modifier = modifier)

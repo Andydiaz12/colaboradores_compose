@@ -1,13 +1,13 @@
 package com.upaep.upaeppersonal.view.features.home
 
-import android.Manifest
-import android.content.pm.PackageManager
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +28,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,23 +42,27 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.upaep.upaeppersonal.R
 import com.upaep.upaeppersonal.model.base.UserPreferences
 import com.upaep.upaeppersonal.model.entities.features.home.Feature
+import com.upaep.upaeppersonal.model.entities.features.upress.UpressItem
 import com.upaep.upaeppersonal.view.base.defaultvalues.defaultTheme
 import com.upaep.upaeppersonal.view.base.genericcomponents.Header
+import com.upaep.upaeppersonal.view.base.genericcomponents.LoadingSpinner
 import com.upaep.upaeppersonal.view.base.navigation.Routes
 import com.upaep.upaeppersonal.view.base.theme.Red_darker
 import com.upaep.upaeppersonal.view.base.theme.Upaep_yellow
 import com.upaep.upaeppersonal.view.base.theme.roboto_bold
 import com.upaep.upaeppersonal.view.base.theme.roboto_regular
+import com.upaep.upaeppersonal.viewmodel.features.home.HomeViewModel
 
 @Preview(showSystemUi = true)
 @Composable
 fun HomeScreen(
-//    homeViewModel: HomeViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel(),
     navigation: NavHostController? = null
 ) {
 //    val context = LocalContext.current
@@ -110,6 +116,9 @@ fun HomeScreen(
     val context = LocalContext.current
     val userPreferences = UserPreferences(context)
     val activeTheme = userPreferences.activeTheme.collectAsState(initial = defaultTheme).value
+    val loadingScreen by homeViewModel.loadingScreen.observeAsState()
+    val features = homeViewModel.features
+    val news = homeViewModel.news
 
     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
         val (header, content) = createRefs()
@@ -128,7 +137,16 @@ fun HomeScreen(
             },
             textColor = activeTheme!!.BASE_TEXT_COLOR,
             cardColor = activeTheme.BASE_BACKGROUND_COLOR,
-            navigation = navigation
+            navigation = navigation,
+            pageContent = news,
+            onClick = { upressItem ->
+                homeViewModel.navigateToNews(
+                    navigation = navigation,
+                    clickedNew = upressItem
+                )
+            },
+            features = features,
+            loadingScreen = loadingScreen!!
         )
     }
 }
@@ -138,28 +156,47 @@ fun ContentSection(
     modifier: Modifier,
     textColor: Color,
     cardColor: Color,
-    navigation: NavHostController?
+    navigation: NavHostController?,
+    pageContent: List<UpressItem>,
+    onClick: (UpressItem) -> Unit,
+    features: List<Feature>,
+    loadingScreen: Boolean
 ) {
-    LazyColumn(
-        modifier = modifier.padding(horizontal = 15.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        item {
-            Spacer(modifier = Modifier.size(20.dp))
-            UpressContainer(textColor = textColor, cardColor = cardColor)
-            FeaturesContainer(
-                features = getFeatures().sortedBy { it.order },
-                textColor = textColor,
-                navigation = navigation
-            )
+    if (loadingScreen) {
+        LoadingSpinner()
+    } else {
+        LazyColumn(
+            modifier = modifier.padding(horizontal = 15.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            item {
+                Spacer(modifier = Modifier.size(20.dp))
+                if (pageContent.isNotEmpty()) {
+                    UpressContainer(
+                        textColor = textColor,
+                        cardColor = cardColor,
+                        pageContent = pageContent,
+                        onClick = onClick
+                    )
+                }
+                FeaturesContainer(
+                    features = features,
+                    textColor = textColor,
+                    navigation = navigation
+                )
+            }
         }
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun UpressContainer(textColor: Color, cardColor: Color) {
-    val pageContent = getUpressNews()
+fun UpressContainer(
+    textColor: Color,
+    cardColor: Color,
+    pageContent: List<UpressItem>,
+    onClick: (UpressItem) -> Unit
+) {
     val pagerState = rememberPagerState(
         initialPage = 0,
         initialPageOffsetFraction = 0f,
@@ -172,7 +209,7 @@ fun UpressContainer(textColor: Color, cardColor: Color) {
     ) {
         HorizontalPager(state = pagerState, modifier = Modifier.padding(15.dp)) { index ->
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                IndividualUpress(pageContent[index], textColor = textColor)
+                IndividualUpress(pageContent[index], textColor = textColor, onClick = onClick)
             }
         }
     }
@@ -187,8 +224,15 @@ fun UpressContainer(textColor: Color, cardColor: Color) {
 }
 
 @Composable
-fun IndividualUpress(upress: TestUpress, textColor: Color) {
-    Row(modifier = Modifier.fillMaxWidth()) {
+fun IndividualUpress(upress: UpressItem, textColor: Color, onClick: (UpressItem) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(
+                indication = null,
+                interactionSource = MutableInteractionSource(),
+                onClick = { onClick(upress) })
+    ) {
         Image(
             painter = painterResource(id = R.drawable.icono_upress_home),
             contentDescription = "",
@@ -196,7 +240,7 @@ fun IndividualUpress(upress: TestUpress, textColor: Color) {
         )
         Spacer(modifier = Modifier.size(10.dp))
         Text(
-            text = upress.title,
+            text = upress.title ?: "",
             fontFamily = roboto_bold,
             overflow = TextOverflow.Ellipsis,
             color = textColor,
@@ -230,16 +274,19 @@ fun FeaturesContainer(features: List<Feature>, textColor: Color, navigation: Nav
                     if (colIndex < features.size) {
                         IndividualFeature(
                             feature = features[colIndex],
-                            modifier = Modifier.weight(1f).let {
-                                val routes = Routes.getById(features[colIndex].featureId)?.routes
-                                if (routes.isNullOrEmpty()) {
-                                    it
-                                } else {
-                                    it.clickable {
-                                        navigation?.navigate(routes) { launchSingleTop = true }
+                            modifier = Modifier
+                                .weight(1f)
+                                .let {
+                                    val routes =
+                                        Routes.getById(features[colIndex].featureId)?.routes
+                                    if (routes.isNullOrEmpty()) {
+                                        it
+                                    } else {
+                                        it.clickable {
+                                            navigation?.navigate(routes) { launchSingleTop = true }
+                                        }
                                     }
-                                }
-                            },
+                                },
                             textColor = textColor
                         )
                     } else {
@@ -257,16 +304,11 @@ fun FeaturesContainer(features: List<Feature>, textColor: Color, navigation: Nav
 @Composable
 fun IndividualFeature(feature: Feature, modifier: Modifier, textColor: Color) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        if (feature.featureIcon.isNullOrBlank()) {
-            Image(
-                painter = painterResource(id = R.drawable.icono_credencial_testing_delete),
-                contentDescription = "",
-                modifier = Modifier.size(45.dp)
-            )
-//            Icon(imageVector = Icons.Default.Image, contentDescription = "")
-        } else {
-
-        }
+        AsyncImage(
+            model = feature.featureIcon,
+            contentDescription = feature.featureName,
+            modifier = Modifier.size(45.dp)
+        )
         Text(
             text = feature.featureName,
             textAlign = TextAlign.Center,
@@ -289,24 +331,6 @@ fun Dot(activeDot: Boolean) {
     ) {
 
     }
-}
-
-data class TestUpress(
-    val title: String,
-    val url: String
-)
-
-fun getUpressNews(): List<TestUpress> {
-    return listOf(
-        TestUpress(
-            title = "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
-            url = ""
-        ),
-        TestUpress(title = "Title 2", url = ""),
-        TestUpress(title = "Title 3", url = ""),
-        TestUpress(title = "Title 4", url = ""),
-        TestUpress(title = "Title 5", url = "")
-    )
 }
 
 fun getFeatures(): List<Feature> {

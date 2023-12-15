@@ -1,7 +1,11 @@
 package com.upaep.upaeppersonal.model.entities.features.locksmith
 
+import androidx.room.Entity
 import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.Serializable
 
+@Serializable
+@Entity
 data class AESKeychain(
     @SerializedName("AES_BLOCKSIZE")
     var blockSize: Int? = 256,

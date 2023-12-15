@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,6 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.upaep.upaeppersonal.R
 import com.upaep.upaeppersonal.model.base.UserPreferences
 import com.upaep.upaeppersonal.model.entities.features.library.BorrowedBook
@@ -30,20 +32,23 @@ import com.upaep.upaeppersonal.view.base.genericcomponents.BaseView
 import com.upaep.upaeppersonal.view.base.theme.Upaep_yellow
 import com.upaep.upaeppersonal.view.base.theme.roboto_bold
 import com.upaep.upaeppersonal.view.base.theme.roboto_regular
+import com.upaep.upaeppersonal.viewmodel.features.library.BooksListViewModel
 
 @Preview
 @Composable
-fun BooksListScreen() {
+fun BooksListScreen(booksListViewModel: BooksListViewModel = hiltViewModel()) {
     val activeTheme by
     UserPreferences(LocalContext.current).activeTheme.collectAsState(initial = defaultTheme)
-    BaseView(screenName = "BIBLIOTECA") {
-        CardDescription(textColor = activeTheme!!.BASE_TEXT_COLOR)
+    val books = booksListViewModel.books
+    val loadingScreen by booksListViewModel.loadingScreen.observeAsState()
+    val errorInfo by booksListViewModel.error.observeAsState()
+    BaseView(screenName = "BIBLIOTECA", loadingScreen = loadingScreen!!, error = errorInfo, noData = books.isEmpty()) {
+        CardDescription(textColor = activeTheme!!.BASE_TEXT_COLOR, books = books)
     }
 }
 
 @Composable
-fun CardDescription(textColor: Color) {
-    val books = getBooks()
+fun CardDescription(textColor: Color, books: List<BorrowedBook>) {
     Column(modifier = Modifier.padding(vertical = 15.dp)) {
         Text(
             text = "LIBROS PRESTADOS", color = textColor,

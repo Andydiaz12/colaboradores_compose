@@ -5,6 +5,8 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.navigation.NavHostController
+import com.upaep.upaeppersonal.model.entities.base.ErrorInfo
 import com.upaep.upaeppersonal.view.base.theme.Yellow_Schedule
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -20,6 +22,11 @@ fun BaseViewWithModal(
     cardPickerColor: Color = Yellow_Schedule,
     onUpperCardClick: () -> Unit = {},
     upperCardContent: (@Composable () -> Unit)? = null,
+    error: ErrorInfo? = null,
+    onCloseDialog: () -> Unit = {},
+    noData: Boolean = false,
+    loadingScreen: Boolean = false,
+    navigation: NavHostController? = null,
     loading: Boolean
 ) {
     ModalBottomSheetLayout(
@@ -36,9 +43,12 @@ fun BaseViewWithModal(
             onUpperCardClick = onUpperCardClick,
             multipleElements = multipleElements,
             cardPickerColor = cardPickerColor,
-            upperCardContent = upperCardContent
-        ) {
-            content()
-        }
+            upperCardContent = upperCardContent,
+            error = error,
+            navigation = navigation,
+            noData = noData,
+            loadingScreen = loadingScreen,
+            onCloseDialog = onCloseDialog
+        ) { content() }
     }
 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.upaep.upaeppersonal.model.entities.features.mailbox.MailboxFormGet
 import com.upaep.upaeppersonal.model.entities.features.mailbox.MailboxFormResponse
 import com.upaep.upaeppersonal.model.entities.features.mailbox.MailboxSurveyType
 import com.upaep.upaeppersonal.model.entities.features.mailbox.SurveyResponses
@@ -48,7 +49,7 @@ class MailboxViewModel @Inject constructor(private val mailboxRepository: Mailbo
         viewModelScope.launch {
             _selectedOption.value = surveyType
             val response =
-                mailboxRepository.getMailboxSurvey(surveyId = surveyType.topicId).data?.sortedBy { it.order }
+                mailboxRepository.getMailboxSurvey(mailboxFormGet = MailboxFormGet(topicId = surveyType.topicId)).data?.sortedBy { it.order }
             _answers.clear()
             _surveyOptions.clear()
             response?.forEach { element ->
@@ -72,7 +73,8 @@ class MailboxViewModel @Inject constructor(private val mailboxRepository: Mailbo
     fun inputChange(element: MailboxFormResponse, value: String, componentType: Int = -1) {
         val elementToFind = _answers.find { it.itemId == element.itemId }
         val index = _answers.indexOf(elementToFind)
-        _answers[index] = _answers[index].copy(responseValue = if(componentType == 16) null else value)
+        _answers[index] =
+            _answers[index].copy(responseValue = if (componentType == 16) null else value)
         _enabledBtn.value = enabledBtn()
     }
 

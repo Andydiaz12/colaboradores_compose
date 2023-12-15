@@ -1,5 +1,6 @@
 package com.upaep.upaeppersonal.view.base.genericcomponents
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -30,6 +31,7 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.atMostWrapContent
 import androidx.navigation.NavHostController
 import com.upaep.upaeppersonal.model.base.UserPreferences
+import com.upaep.upaeppersonal.model.entities.base.ErrorInfo
 import com.upaep.upaeppersonal.model.entities.theme.ActiveTheme
 import com.upaep.upaeppersonal.view.base.defaultvalues.defaultTheme
 import com.upaep.upaeppersonal.view.base.theme.Yellow_Schedule
@@ -50,39 +52,73 @@ fun BaseView(
     navigation: NavHostController? = null,
     transparentBackground: Boolean = false,
     cardPickerColor: Color = Yellow_Schedule,
+    error: ErrorInfo? = null,
     upperCardContent: (@Composable () -> Unit)? = null,
+    onCloseDialog: () -> Unit = {},
+    noData: Boolean = false,
+    loadingScreen: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
     val userPreferences = UserPreferences(context)
     val activeTheme = userPreferences.activeTheme.collectAsState(initial = defaultTheme).value
     val refreshState = rememberPullRefreshState(refreshing = loading, onRefresh = { onRefresh() })
-    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-        val (header, cardContent) = createRefs()
-        Header(modifier = Modifier.constrainAs(header) {
-            top.linkTo(parent.top)
-        }, navigation = navigation, screenName = screenName, rightIcon = rightIcon)
-        CardContent(
-            refreshState = refreshState,
-            text = text,
-            activeTheme = activeTheme!!,
-            loading = loading,
-            content = content,
-            modifier = Modifier.constrainAs(cardContent) {
-                top.linkTo(header.bottom)
-                bottom.linkTo(parent.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                height = Dimension.fillToConstraints.atMostWrapContent
-            },
-            transparentBackground = transparentBackground,
-            lazyPadding = lazyPadding,
-            upperCardText = upperCardText,
-            onUpperCardClick = onUpperCardClick,
-            multipleElements = multipleElements,
-            cardPickerColor = cardPickerColor,
-            upperCardContent = upperCardContent
-        )
+    if (loadingScreen) {
+        LoadingSpinner()
+    } else {
+        ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+            val (header, cardContent) = createRefs()
+            Header(modifier = Modifier.constrainAs(header) {
+                top.linkTo(parent.top)
+            }, navigation = navigation, screenName = screenName, rightIcon = rightIcon)
+            if (noData) {
+                Column(
+                    modifier = Modifier
+                        .constrainAs(cardContent) {
+                            top.linkTo(header.bottom)
+                            bottom.linkTo(parent.bottom)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            height = Dimension.fillToConstraints.atMostWrapContent
+                        }
+                ) {
+                    Box {
+                        NoDataFound(modifier = Modifier.pullRefresh(refreshState))
+                        PullRefreshIndicator(
+                            refreshing = loading,
+                            state = refreshState,
+                            modifier = Modifier.align(Alignment.TopCenter),
+                            backgroundColor = if (loading) Color.Yellow else Color.Magenta,
+                        )
+                    }
+                }
+            } else {
+                CardContent(
+                    refreshState = refreshState,
+                    text = text,
+                    activeTheme = activeTheme!!,
+                    loading = loading,
+                    content = content,
+                    modifier = Modifier.constrainAs(cardContent) {
+                        top.linkTo(header.bottom)
+                        bottom.linkTo(parent.bottom)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                        height = Dimension.fillToConstraints.atMostWrapContent
+                    },
+                    transparentBackground = transparentBackground,
+                    lazyPadding = lazyPadding,
+                    upperCardText = upperCardText,
+                    onUpperCardClick = onUpperCardClick,
+                    multipleElements = multipleElements,
+                    cardPickerColor = cardPickerColor,
+                    upperCardContent = upperCardContent
+                )
+            }
+        }
+    }
+    if (error?.visible == true) {
+        ErrorDialog(message = error.message ?: "", onCloseDialog = { onCloseDialog() })
     }
 }
 
@@ -118,7 +154,7 @@ fun CardContent(
             )
             Spacer(modifier = Modifier.size(15.dp))
         }
-        if(upperCardContent != null) {
+        if (upperCardContent != null) {
             upperCardContent()
         }
         Card(

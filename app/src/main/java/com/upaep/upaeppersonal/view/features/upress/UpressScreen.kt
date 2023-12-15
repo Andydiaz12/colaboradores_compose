@@ -1,5 +1,6 @@
 package com.upaep.upaeppersonal.view.features.upress
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,10 +17,11 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -50,8 +52,8 @@ fun UpressScreen(
 ) {
     val activeTheme by UserPreferences(LocalContext.current).activeTheme.collectAsState(initial = defaultTheme)
     val state = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-    val upressOptionList = getUpressOptions()
-    var selectedOption by remember { mutableStateOf(upressOptionList.first()) }
+    val upressOptionList = upressViewModel.upressOptionList
+    val selectedOption by upressViewModel.selectedOption.observeAsState()
     val scope = rememberCoroutineScope()
     val upressList = upressViewModel.upressElements
     BaseViewWithModal(
@@ -70,13 +72,13 @@ fun UpressScreen(
         },
         state = state,
         loading = false,
-        upperCardText = selectedOption.title,
+        upperCardText = selectedOption?.title ?: "",
         onUpperCardClick = { scope.launch { state.show() } },
         modalContent = {
             ModalListGeneric(
                 onElementClick = { element ->
                     scope.launch {
-                        selectedOption = element as UpressOptions
+                        upressViewModel.changeSelectedOption(element = element as UpressOptions)
                         state.hide()
                     }
                 },

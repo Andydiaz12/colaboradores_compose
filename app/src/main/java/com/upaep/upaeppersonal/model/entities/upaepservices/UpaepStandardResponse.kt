@@ -6,9 +6,9 @@ data class UpaepStandardResponse<T>(
     @SerializedName("CRYPTDATA")
     val data: T? = null,
     @SerializedName("statusCode")
-    var statusCode: Int? = null,
+    var statusCode: Int = 12163,
     @SerializedName("error")
-    var error: Boolean? = null,
+    var error: Boolean = true,
     @SerializedName("message")
-    var message: String? = null
+    var message: String = "No podemos acceder a la información debido a una falla en el servicio.\nInténtalo de nuevo más tarde o verifica tu conexión a internet."
 )

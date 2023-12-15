@@ -26,8 +26,7 @@ class MainActivityViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            Log.i("getLocksmith", "viewmodel")
-            locksmithRepository.getLocksmith()
+            locksmithRepository.getLocksmithFromService()
         }
     }
 

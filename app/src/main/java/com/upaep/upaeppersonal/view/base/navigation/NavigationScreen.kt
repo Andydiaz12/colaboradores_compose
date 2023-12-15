@@ -7,10 +7,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.upaep.upaeppersonal.view.features.assistance.AssistanceClassScreen
 import com.upaep.upaeppersonal.view.features.assistance.AssistanceScreen
+import com.upaep.upaeppersonal.view.features.benefits.BenefitsByCategoryScreen
 import com.upaep.upaeppersonal.view.features.benefits.BenefitsScreen
 import com.upaep.upaeppersonal.view.features.calendar.CalendarScreen
 import com.upaep.upaeppersonal.view.features.credential.CredentialScreen
 import com.upaep.upaeppersonal.view.features.credential.QrScreen
+import com.upaep.upaeppersonal.view.features.dailymail.DailyMailByCategoryScreen
+import com.upaep.upaeppersonal.view.features.dailymail.DailyMailScreen
 import com.upaep.upaeppersonal.view.features.directory.DirectoryScreen
 import com.upaep.upaeppersonal.view.features.events.EventsScreen
 import com.upaep.upaeppersonal.view.features.home.HomeScreen
@@ -19,7 +22,10 @@ import com.upaep.upaeppersonal.view.features.library.LibraryScreen
 import com.upaep.upaeppersonal.view.features.login.LoginScreen
 import com.upaep.upaeppersonal.view.features.mailbox.MailboxScreen
 import com.upaep.upaeppersonal.view.features.menu.MenuScreen
+import com.upaep.upaeppersonal.view.features.menu.PrivacyScreen
 import com.upaep.upaeppersonal.view.features.parku.ParkUScreen
+import com.upaep.upaeppersonal.view.features.pfi.PfiByCategoryScreen
+import com.upaep.upaeppersonal.view.features.pfi.PfiScreen
 import com.upaep.upaeppersonal.view.features.schedule.ScheduleScreen
 import com.upaep.upaeppersonal.view.features.token.TokenScreen
 import com.upaep.upaeppersonal.view.features.upress.UpressDescriptionScreen
@@ -57,7 +63,7 @@ fun AppNavigation() {
             AssistanceScreen()
         }
         composable(Routes.BenefitsScreen.routes) {
-            BenefitsScreen()
+            BenefitsScreen(navigation = navigationController)
         }
         composable(Routes.ParkUScreen.routes) {
             ParkUScreen()
@@ -85,6 +91,24 @@ fun AppNavigation() {
         }
         composable(Routes.EventsScreen.routes) {
             EventsScreen()
+        }
+        composable(Routes.PrivacyPolicyScreen.routes) {
+            PrivacyScreen(navigation = navigationController)
+        }
+        composable(Routes.BenefitsByCategoryScreen.routes) {
+            BenefitsByCategoryScreen(navigation = navigationController)
+        }
+        composable(Routes.PfiScreen.routes) {
+            PfiScreen(navigation = navigationController)
+        }
+        composable(Routes.PfiByCategoryScreen.routes) {
+            PfiByCategoryScreen()
+        }
+        composable(Routes.DailyMailScreen.routes) {
+            DailyMailScreen(navigation = navigationController)
+        }
+        composable(Routes.DailyMailByCategoryScreen.routes) {
+            DailyMailByCategoryScreen(navigation = navigationController)
         }
     }
 }

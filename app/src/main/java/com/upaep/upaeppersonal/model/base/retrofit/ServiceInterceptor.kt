@@ -19,13 +19,12 @@ class ServiceInterceptor @Inject constructor() : Interceptor {
             JWT_KEY = keyChain.JWTKeychain!!.jwtKey!!,
             JSON_KEY = keyChain.JWTKeychain?.jsonKey ?: "key"
         )
-        Log.i("responseLocksmith_1", this.authorization)
     }
 
-//    fun setAuthOpenId(text: String) {
-//        this.authorization = text
-//    }
-//
+    fun setAuthOpenId(text: String) {
+        this.authorization = text
+    }
+
     override fun intercept(chain: Interceptor.Chain): Response {
         val request: Request = chain.request()
         val requestBuilder: Request.Builder = request.newBuilder()

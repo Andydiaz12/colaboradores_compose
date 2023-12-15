@@ -43,8 +43,11 @@ class LocksmithService @Inject constructor(
         return withContext(Dispatchers.IO) {
             try {
                 val response = api.getLockSmith(cryptdata = request)
-                if(response.isSuccessful && response.body()!!.error!!) {
-                    UpaepStandardResponse()
+                if (response.isSuccessful && !response.body()!!.error) {
+                    val cryptdata = response.body()!!.data!!
+                    val decryptdata = AESHelper.decrypt(cryptdata, AESAncestral.getAES())
+                    val locksmith = gson.fromJson(decryptdata, Locksmith::class.java)
+                    UpaepStandardResponse(data = locksmith, error = false)
                 } else {
                     UpaepStandardResponse()
                 }
@@ -52,6 +55,5 @@ class LocksmithService @Inject constructor(
                 UpaepStandardResponse(message = exceptionHandler(e))
             }
         }
-//        api.getLockSmith()
     }
 }

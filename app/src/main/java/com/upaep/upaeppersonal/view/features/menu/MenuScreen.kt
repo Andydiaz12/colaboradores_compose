@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -69,7 +70,8 @@ fun MenuScreen(
                     }
                 },
                 selectedTheme = selectedTheme,
-                contentOptions = contentOptions
+                contentOptions = contentOptions,
+                navigation = navigation
             )
         }
     }
@@ -89,7 +91,8 @@ fun Content(
     activeTheme: ActiveTheme,
     onThemeChange: () -> Unit,
     selectedTheme: Float,
-    contentOptions: List<MenuElements>
+    contentOptions: List<MenuElements>,
+    navigation: NavHostController?
 ) {
     Column(modifier = Modifier.padding(horizontal = 25.dp)) {
         Spacer(modifier = Modifier.size(15.dp))
@@ -104,7 +107,15 @@ fun Content(
         }
         Spacer(modifier = Modifier.size(20.dp))
         for (element in contentOptions) {
-            Text(text = element.name, color = activeTheme.BASE_TEXT_COLOR)
+            Text(
+                text = element.name,
+                color = activeTheme.BASE_TEXT_COLOR,
+                modifier = Modifier.clickable(
+                    onClick = { element.action(navigation) },
+                    interactionSource = MutableInteractionSource(),
+                    indication = null
+                )
+            )
             Spacer(modifier = Modifier.size(20.dp))
         }
     }
@@ -124,7 +135,6 @@ fun AnimatedSwitch(selectedTheme: Float, onThemeChange: () -> Unit) {
             .height(25.dp)
             .clickable {
                 onThemeChange()
-//                horizontalBias *= -1
             },
         horizontalAlignment = alignment
     ) {

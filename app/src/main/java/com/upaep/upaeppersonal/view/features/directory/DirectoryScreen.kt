@@ -1,5 +1,6 @@
 package com.upaep.upaeppersonal.view.features.directory
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
@@ -29,7 +30,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,29 +41,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.upaep.upaeppersonal.R
+import com.upaep.upaeppersonal.model.base.UserPreferences
 import com.upaep.upaeppersonal.model.entities.features.directory.DirectoryPerson
+import com.upaep.upaeppersonal.model.entities.theme.ActiveTheme
+import com.upaep.upaeppersonal.view.base.defaultvalues.defaultTheme
 import com.upaep.upaeppersonal.view.base.genericcomponents.BaseView
 import com.upaep.upaeppersonal.view.base.genericcomponents.EmptyData
 import com.upaep.upaeppersonal.view.base.theme.Arrow_color
 import com.upaep.upaeppersonal.view.base.theme.Dark_grey
 import com.upaep.upaeppersonal.view.base.theme.Gray_title
+import com.upaep.upaeppersonal.viewmodel.features.directory.DirectoryViewModel
 
 @Preview(showSystemUi = true)
 @Composable
-fun DirectoryScreen() {
-    val directoryPeople = getPeople()
-    val visibleDescription by remember {
-        mutableStateOf(mutableStateListOf<Boolean>())
-    }
+fun DirectoryScreen(directoryViewModel: DirectoryViewModel = hiltViewModel()) {
+    val activeTheme by UserPreferences(LocalContext.current).activeTheme.collectAsState(initial = defaultTheme)
+    val directoryPeople = directoryViewModel.peopleList
+    val visibleDescription = directoryViewModel.visibleDescription
     var searchValue by remember { mutableStateOf("") }
-
-    repeat(directoryPeople.size) {
-        visibleDescription.add(false)
-    }
 
     BaseView(screenName = "DIRECTORIO") {
         DirectoryContent(
@@ -70,8 +74,15 @@ fun DirectoryScreen() {
             },
             visibleDescription = visibleDescription,
             value = searchValue,
-            onValueChange = { newValue -> searchValue = newValue },
-            resetValue = { searchValue = "" }
+            onValueChange = { newValue ->
+                searchValue = newValue
+                directoryViewModel.getData(searchValue)
+            },
+            resetValue = {
+                searchValue = ""
+                directoryViewModel.clearData()
+            },
+            theme = activeTheme!!
         )
     }
 }
@@ -83,7 +94,8 @@ fun DirectoryContent(
     visibleDescription: List<Boolean>,
     value: String,
     onValueChange: (String) -> Unit,
-    resetValue: () -> Unit
+    resetValue: () -> Unit,
+    theme: ActiveTheme
 ) {
     Column {
         BasicTextField(
@@ -119,7 +131,7 @@ fun DirectoryContent(
                             .padding(start = 5.dp)
                     ) {
                         if (value.isEmpty()) {
-                            Text(text = "Buscar")
+                            Text(text = "Buscar", color = theme.BASE_TEXT_COLOR)
                         }
                         innerTextField()
                     }
@@ -130,15 +142,16 @@ fun DirectoryContent(
                 }
             })
         Spacer(modifier = Modifier.size(10.dp))
-        if (true) {
-            EmptyData(message = "No se han encontrado datos")
+        if (directoryPeople.isEmpty()) {
+            EmptyData(message = "No se han encontrado datos", theme = theme)
         } else {
             directoryPeople.forEachIndexed { index, person ->
                 SinglePersonDesc(
                     directoryPerson = person,
                     index = index,
                     onPersonClick = onPersonClick,
-                    isVisible = visibleDescription[index]
+                    isVisible = visibleDescription[index],
+                    theme = theme
                 )
             }
         }
@@ -150,9 +163,10 @@ fun SinglePersonDesc(
     directoryPerson: DirectoryPerson,
     index: Int,
     onPersonClick: (Int) -> Unit,
-    isVisible: Boolean
+    isVisible: Boolean,
+    theme: ActiveTheme
 ) {
-    val currentRotation by remember { mutableStateOf(0f) }
+    val currentRotation by remember { mutableFloatStateOf(0f) }
     val rotation = remember { Animatable(currentRotation) }
     Column {
         Row(
@@ -169,7 +183,11 @@ fun SinglePersonDesc(
                     .padding(start = 5.dp, end = 10.dp)
                     .size(14.dp)
             )
-            Text(text = directoryPerson.name ?: "", modifier = Modifier.weight(1f))
+            Text(
+                text = directoryPerson.name ?: "",
+                modifier = Modifier.weight(1f),
+                color = theme.BASE_TEXT_COLOR
+            )
             Icon(
                 imageVector = Icons.Default.ArrowDropDown,
                 contentDescription = "",
@@ -182,7 +200,7 @@ fun SinglePersonDesc(
             enter = expandVertically(expandFrom = Alignment.Top),
             exit = shrinkVertically(shrinkTowards = Alignment.Top)
         ) {
-            PersonDescription(directoryPerson = directoryPerson)
+            PersonDescription(directoryPerson = directoryPerson, theme = theme)
         }
         Divider()
         LaunchedEffect(isVisible) {
@@ -198,31 +216,34 @@ fun SinglePersonDesc(
 }
 
 @Composable
-fun PersonDescription(directoryPerson: DirectoryPerson) {
+fun PersonDescription(directoryPerson: DirectoryPerson, theme: ActiveTheme) {
     Column {
         if (!directoryPerson.departament.isNullOrBlank()) {
             DescriptionContainer(
                 image = R.drawable.icono_ubicacion_directorio,
-                text = directoryPerson.departament!!
+                text = directoryPerson.departament!!,
+                theme = theme
             )
         }
         if (!directoryPerson.phone.isNullOrBlank()) {
             DescriptionContainer(
                 image = R.drawable.icono_telefono_directorio,
-                text = directoryPerson.phone!!
+                text = directoryPerson.phone!!,
+                theme = theme
             )
         }
         if (!directoryPerson.mail.isNullOrBlank()) {
             DescriptionContainer(
                 image = R.drawable.icono_correo_directorio,
-                text = directoryPerson.mail!!
+                text = directoryPerson.mail!!,
+                theme = theme
             )
         }
     }
 }
 
 @Composable
-fun DescriptionContainer(image: Int, text: String) {
+fun DescriptionContainer(image: Int, text: String, theme: ActiveTheme) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(vertical = 8.dp)
@@ -234,7 +255,7 @@ fun DescriptionContainer(image: Int, text: String) {
                 .padding(horizontal = 15.dp)
                 .size(15.dp)
         )
-        Text(text = text)
+        Text(text = text, color = theme.BASE_TEXT_COLOR)
     }
 }
 
