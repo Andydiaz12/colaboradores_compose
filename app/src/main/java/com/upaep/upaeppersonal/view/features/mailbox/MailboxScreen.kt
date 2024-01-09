@@ -65,6 +65,7 @@ import com.upaep.upaeppersonal.model.base.UserPreferences
 import com.upaep.upaeppersonal.model.entities.features.mailbox.MailboxFormResponse
 import com.upaep.upaeppersonal.model.entities.features.mailbox.MailboxSurveyType
 import com.upaep.upaeppersonal.model.entities.features.mailbox.SurveyResponses
+import com.upaep.upaeppersonal.model.entities.theme.ActiveTheme
 import com.upaep.upaeppersonal.view.base.defaultvalues.defaultTheme
 import com.upaep.upaeppersonal.view.base.genericcomponents.BaseViewWithModal
 import com.upaep.upaeppersonal.view.base.genericcomponents.InputDownLine
@@ -107,7 +108,8 @@ fun MailboxScreen(mailboxViewModel: MailboxViewModel = hiltViewModel()) {
             MailboxSurvey(
                 surveyOptions = surveyOptions,
                 mailboxViewModel = mailboxViewModel,
-                answers = answers
+                answers = answers,
+                activeTheme = activeTheme!!
             )
         },
         state = state,
@@ -122,12 +124,13 @@ fun MailboxScreen(mailboxViewModel: MailboxViewModel = hiltViewModel()) {
 fun MailboxSurvey(
     surveyOptions: List<MailboxFormResponse>,
     mailboxViewModel: MailboxViewModel,
-    answers: List<SurveyResponses>
+    answers: List<SurveyResponses>,
+    activeTheme: ActiveTheme
 ) {
     Column(modifier = Modifier.padding(top = 10.dp)) {
         surveyOptions.forEach { element ->
             if (!element.indication.isNullOrEmpty() && element.componentType != 17) {
-                Text(text = element.indication!!)
+                Text(text = element.indication!!, color = activeTheme.BASE_TEXT_COLOR)
             }
             when (element.componentType) {
                 1 -> { //Input con línea abajo
@@ -136,14 +139,23 @@ fun MailboxSurvey(
                         onValueChange = { inputValue ->
                             mailboxViewModel.inputChange(element = element, value = inputValue)
                         },
-                        label = element.title
+                        label = element.title,
+                        labelColor = activeTheme.BASE_TEXT_COLOR
                     )
                 }
 
                 2 -> { //Contenedor tipo de queja radio
-                    RadioContainerType(radioGroup = element, onSelectionChange = { radioValue, componentType ->
-                        mailboxViewModel.inputChange(element = element, value = radioValue, componentType = componentType ?: -1)
-                    })
+                    RadioContainerType(
+                        radioGroup = element,
+                        onSelectionChange = { radioValue, componentType ->
+                            mailboxViewModel.inputChange(
+                                element = element,
+                                value = radioValue,
+                                componentType = componentType ?: -1
+                            )
+                        },
+                        textColor = activeTheme.BASE_TEXT_COLOR
+                    )
                 }
 
                 4 -> { //Aviso de privacidad
@@ -155,7 +167,8 @@ fun MailboxSurvey(
                                 value = inputValue.toString()
                             )
                         },
-                        text = element.title ?: ""
+                        text = element.title ?: "",
+                        textColor = activeTheme.BASE_TEXT_COLOR
                     )
                 }
 
@@ -181,10 +194,15 @@ fun MailboxSurvey(
 }
 
 @Composable
-fun RowAcceptPrivacy(checked: Boolean, onCheckedChange: (Boolean) -> Unit, text: String) {
+fun RowAcceptPrivacy(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    text: String,
+    textColor: Color
+) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Checkbox(checked = checked, onCheckedChange = { onCheckedChange(it) })
-        Text(text = text)
+        Text(text = text, color = textColor)
     }
 }
 
@@ -214,7 +232,8 @@ fun CenteredButton(
 @Composable
 fun RadioContainerType(
     radioGroup: MailboxFormResponse,
-    onSelectionChange: (String, Int?) -> Unit
+    onSelectionChange: (String, Int?) -> Unit,
+    textColor: Color
 ) {
     var selection by remember { mutableIntStateOf(0) }
     Column(modifier = Modifier.padding(vertical = 10.dp)) {
@@ -227,7 +246,7 @@ fun RadioContainerType(
             SimpleRadioButtonRow(radioButton = child, selection = selection, onSelectOption = {
                 selection = it
                 onSelectionChange(selection.toString(), child.componentType)
-            })
+            }, textColor = textColor)
             AnimatedVisibility(visible = (child.componentType == 16 && selection == child.itemId)) {
                 child.childs.forEach { element ->
                     var value by remember { mutableStateOf("") }
@@ -249,14 +268,18 @@ fun RadioContainerType(
 fun SimpleRadioButtonRow(
     radioButton: MailboxFormResponse,
     selection: Int,
+    textColor: Color,
     onSelectOption: (Int) -> Unit
 ) {
     Row(modifier = Modifier.padding(bottom = 7.dp)) {
         CustomRadioButton(
             selected = (radioButton.itemId == selection),
-            onClick = { onSelectOption(radioButton.itemId ?: -1) })
+            onClick = { onSelectOption(radioButton.itemId ?: -1) },
+            circleColor = textColor
+            )
         Spacer(modifier = Modifier.size(5.dp))
         Text(
+            color = textColor,
             text = radioButton.title ?: "",
             fontFamily = roboto_regular,
             fontSize = 14.sp,
@@ -274,6 +297,7 @@ fun CustomRadioButton(
     onClick: (() -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    circleColor: Color,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     val dotRadius = animateDpAsState(
@@ -305,12 +329,12 @@ fun CustomRadioButton(
     ) {
         val strokeWidth = 2.dp.toPx()
         drawCircle(
-            Color.Black,
+            color = circleColor,
             radius = (20.0.dp / 2).toPx() - strokeWidth / 2,
             style = Stroke(strokeWidth)
         )
         if (dotRadius.value > 0.dp) {
-            drawCircle(Color.Black, dotRadius.value.toPx() - strokeWidth / 2, style = Fill)
+            drawCircle(circleColor, dotRadius.value.toPx() - strokeWidth / 2, style = Fill)
         }
     }
 }

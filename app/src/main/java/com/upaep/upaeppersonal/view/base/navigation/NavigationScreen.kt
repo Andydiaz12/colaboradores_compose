@@ -13,6 +13,7 @@ import com.upaep.upaeppersonal.view.features.calendar.CalendarScreen
 import com.upaep.upaeppersonal.view.features.credential.CredentialScreen
 import com.upaep.upaeppersonal.view.features.credential.QrScreen
 import com.upaep.upaeppersonal.view.features.dailymail.DailyMailByCategoryScreen
+import com.upaep.upaeppersonal.view.features.dailymail.DailyMailDescriptionScreen
 import com.upaep.upaeppersonal.view.features.dailymail.DailyMailScreen
 import com.upaep.upaeppersonal.view.features.directory.DirectoryScreen
 import com.upaep.upaeppersonal.view.features.events.EventsScreen
@@ -109,6 +110,9 @@ fun AppNavigation() {
         }
         composable(Routes.DailyMailByCategoryScreen.routes) {
             DailyMailByCategoryScreen(navigation = navigationController)
+        }
+        composable(Routes.DailyMailDescriptionScreen.routes) {
+            DailyMailDescriptionScreen(navigation = navigationController)
         }
     }
 }

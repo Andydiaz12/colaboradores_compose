@@ -34,6 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.upaep.upaeppersonal.model.base.UserPreferences
 import com.upaep.upaeppersonal.view.base.defaultvalues.defaultTheme
 import com.upaep.upaeppersonal.view.base.genericcomponents.BaseView
@@ -42,12 +43,13 @@ import com.upaep.upaeppersonal.view.base.genericcomponents.ModalListGeneric
 import com.upaep.upaeppersonal.view.base.theme.Yellow_Schedule
 import com.upaep.upaeppersonal.view.base.theme.roboto_bold
 import com.upaep.upaeppersonal.view.base.theme.roboto_regular
+import com.upaep.upaeppersonal.viewmodel.features.schedule.ScheduleViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
-fun ScheduleScreen() {
+fun ScheduleScreen(scheduleViewModel: ScheduleViewModel = hiltViewModel()) {
     val userPreferences = UserPreferences(LocalContext.current)
     val activeTheme = userPreferences.activeTheme.collectAsState(initial = defaultTheme).value
     val state = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)

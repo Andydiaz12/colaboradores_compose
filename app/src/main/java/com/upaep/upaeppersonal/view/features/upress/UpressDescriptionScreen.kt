@@ -36,6 +36,7 @@ import coil.compose.AsyncImage
 import com.upaep.upaeppersonal.R
 import com.upaep.upaeppersonal.model.entities.features.upress.UpressItem
 import com.upaep.upaeppersonal.view.base.genericcomponents.BaseView
+import com.upaep.upaeppersonal.view.base.genericcomponents.HtmlContent
 import com.upaep.upaeppersonal.view.base.theme.roboto_bold
 import com.upaep.upaeppersonal.view.base.theme.roboto_regular
 import com.upaep.upaeppersonal.viewmodel.features.upress.UpressDescriptionViewModel
@@ -105,18 +106,4 @@ fun UpressContent(item: UpressItem?, fontSize: Float) {
         Text(text = textContent, color = Color.Black, fontFamily = roboto_regular)
         HtmlContent(content = item?.introtext ?: "", fontSize = fontSize)
     }
-}
-
-@Composable
-fun HtmlContent(content: String, fontSize: Float) {
-    AndroidView(
-        factory = { context -> TextView(context) },
-        update = {
-            it.text = HtmlCompat.fromHtml(
-                content,
-                HtmlCompat.FROM_HTML_MODE_COMPACT
-            )
-            it.textSize = fontSize
-        }
-    )
 }

@@ -28,6 +28,7 @@ sealed class Routes(val routes: String, val id: String = "") {
     data object PfiByCategoryScreen : Routes("pfiByCategory")
     data object DailyMailScreen : Routes("dailyMailScreen", id = "38")
     data object DailyMailByCategoryScreen : Routes("dailyMailByCategoryScreen")
+    data object DailyMailDescriptionScreen : Routes("dailyMailDescriptionScreen")
 
     companion object {
         fun getById(id: String): Routes? {

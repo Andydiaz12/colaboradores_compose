@@ -45,34 +45,34 @@ class MainActivity : ComponentActivity() {
             val context = LocalContext.current
             val appUpdateManager = AppUpdateManagerFactory.create(context)
             val appUpdateInfoTask = appUpdateManager.appUpdateInfo
-            var updateValidation by remember { mutableStateOf(false) }
-            appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
-                if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(
-                        AppUpdateType.IMMEDIATE
-                    )
-                ) {
-                    val appPackageName = "com.upaep.upaeppersonal"
-                    try {
-                        startActivity(
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse("market://details?id=$appPackageName")
-                            )
-                        )
-                    } catch (e: ActivityNotFoundException) {
-                        startActivity(
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
-                            )
-                        )
-                    }
-                } else {
-                    updateValidation = true
-                }
-            }.addOnFailureListener {
-                updateValidation = true
-            }
+            var updateValidation by remember { mutableStateOf(true) }
+//            appUpdateInfoTask.addOnSuccessListener { appUpdateInfo ->
+//                if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE && appUpdateInfo.isUpdateTypeAllowed(
+//                        AppUpdateType.IMMEDIATE
+//                    )
+//                ) {
+//                    val appPackageName = "com.upaep.upaeppersonal"
+//                    try {
+//                        startActivity(
+//                            Intent(
+//                                Intent.ACTION_VIEW,
+//                                Uri.parse("market://details?id=$appPackageName")
+//                            )
+//                        )
+//                    } catch (e: ActivityNotFoundException) {
+//                        startActivity(
+//                            Intent(
+//                                Intent.ACTION_VIEW,
+//                                Uri.parse("https://play.google.com/store/apps/details?id=$appPackageName")
+//                            )
+//                        )
+//                    }
+//                } else {
+//                    updateValidation = true
+//                }
+//            }.addOnFailureListener {
+//                updateValidation = true
+//            }
 
             if (updateValidation) {
                 val userPreferences = UserPreferences(context)

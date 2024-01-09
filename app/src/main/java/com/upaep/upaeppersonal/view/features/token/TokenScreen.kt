@@ -1,33 +1,28 @@
 package com.upaep.upaeppersonal.view.features.token
 
-import androidx.compose.foundation.background
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+import android.telephony.TelephonyManager
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ButtonColors
-import androidx.compose.material.Icon
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.TextButton
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -36,42 +31,75 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TransformedText
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.upaep.upaeppersonal.model.base.UserPreferences
 import com.upaep.upaeppersonal.model.entities.theme.ActiveTheme
 import com.upaep.upaeppersonal.view.base.defaultvalues.defaultTheme
 import com.upaep.upaeppersonal.view.base.genericcomponents.BaseView
-import com.upaep.upaeppersonal.view.base.genericcomponents.NoDataFound
 import com.upaep.upaeppersonal.view.base.theme.Gray_title
 import com.upaep.upaeppersonal.view.base.theme.Red_Upaep_Splash
 import com.upaep.upaeppersonal.view.base.theme.Upaep_yellow
 import com.upaep.upaeppersonal.view.base.theme.roboto_regular
+import com.upaep.upaeppersonal.viewmodel.features.token.TokenViewModel
 
 @Preview
 @Composable
-fun TokenScreen() {
+fun TokenScreen(tokenViewModel: TokenViewModel = hiltViewModel()) {
     val userPreferences = UserPreferences(LocalContext.current)
     val activeTheme by userPreferences.activeTheme.collectAsState(initial = defaultTheme)
+    val context = LocalContext.current
+    var imeiAccess by remember { mutableStateOf(false) }
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        Log.i("imei", isGranted.toString())
+        if(isGranted) {
+            tokenViewModel.getImei(context = context)
+        }
+        imeiAccess = isGranted
+    }
     BaseView(onRefresh = { }, loading = false, screenName = "TOKEN") {
         CardContent(activeTheme = activeTheme!!)
+    }
+
+    if (
+        ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.READ_PHONE_STATE
+        ) == PackageManager.PERMISSION_GRANTED
+    ) {
+
+        tokenViewModel.getImei(context = context)
+
+//        tokenViewModel.getImei(context = context)
+    } else {
+        AlertDialog(
+            onDismissRequest = { launcher.launch(Manifest.permission.READ_PHONE_STATE) },
+            confirmButton = {
+                TextButton(onClick = { launcher.launch(Manifest.permission.READ_PHONE_STATE) }) {
+                    Text(text = "Aceptar")
+                }
+            },
+            dismissButton = {
+
+            },
+            text = {
+                Text(
+                    text = "Se necesitan permisos para ocupar esta sección",
+                    fontFamily = roboto_regular
+                )
+            })
     }
 }
 

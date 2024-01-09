@@ -1,6 +1,5 @@
 package com.upaep.upaeppersonal.model.base
 
-import com.upaep.upaeppersonal.model.entities.features.upress.UpressItem
 import com.upaep.upaeppersonal.model.entities.upaepservices.UpaepStandardRequest
 import com.upaep.upaeppersonal.model.entities.upaepservices.UpaepStandardResponse
 import retrofit2.Response
@@ -8,7 +7,6 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
-import retrofit2.http.Url
 
 interface ColaboradoresInterface {
 
@@ -64,5 +62,8 @@ interface ColaboradoresInterface {
     suspend fun getMailCategories(): Response<UpaepStandardResponse<String>>
 
     @GET("collaborators/mailofday_p/")
-    suspend fun getDailyByCategory(@Query("CRYPTDATA") cryptdata: String): Response<UpaepStandardResponse<String>>
+    suspend fun getDailyMailItems(@Query("CRYPTDATA") cryptdata: String): Response<UpaepStandardResponse<String>>
+
+    @GET("collaborators/schedule_p/")
+    suspend fun getSchedule(@Query("CRYPTDATA") cryptdata: String) : Response<UpaepStandardResponse<String>>
 }

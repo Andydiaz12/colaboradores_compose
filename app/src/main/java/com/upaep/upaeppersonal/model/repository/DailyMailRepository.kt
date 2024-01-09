@@ -4,6 +4,7 @@ import com.upaep.upaeppersonal.model.api.features.DailyMailService
 import com.upaep.upaeppersonal.model.base.LocksmithHelper
 import com.upaep.upaeppersonal.model.database.dailymail.DailyMailDAO
 import com.upaep.upaeppersonal.model.entities.features.dailymail.DailyMailCategories
+import com.upaep.upaeppersonal.model.entities.features.dailymail.DailyMailItem
 import com.upaep.upaeppersonal.model.entities.features.dailymail.MailOfDayRequestStructure
 import com.upaep.upaeppersonal.model.entities.upaepservices.UpaepStandardResponse
 import kotlinx.coroutines.Dispatchers
@@ -28,9 +29,15 @@ class DailyMailRepository @Inject constructor(
         }
     }
 
-    suspend fun getDailyByCategory(request: MailOfDayRequestStructure) : UpaepStandardResponse<String> {
+    suspend fun getDailyByCategory(request: MailOfDayRequestStructure) : UpaepStandardResponse<List<DailyMailItem>> {
         val locksmith = locksmithHelper()
         if(locksmith.error) return UpaepStandardResponse(message = locksmith.message)
         return dailyMailService.getMailByCategory(keyChain = locksmith.data!!.apiGeneralMailofday!!, request = request)
+    }
+
+    suspend fun getItemDescription(item: DailyMailItem) : UpaepStandardResponse<List<DailyMailItem>>{
+        val locksmith = locksmithHelper()
+        if(locksmith.error) return UpaepStandardResponse(message = locksmith.message)
+        return dailyMailService.getItemDescription(keyChain = locksmith.data!!.apiGeneralMailofday!!, item = item)
     }
 }
